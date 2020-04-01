@@ -16,8 +16,9 @@ __Composer (recommended):__
 composer require webbuilders-group/silverstripe-recipe-github-ci --dev
 ```
 
+
 ## Getting Started
-This recipe contains support for tests run against [PHPUnit](https://github.com/sebastianbergmann/phpunit) and [Behat](https://github.com/Behat/Behat) as well as code style validation using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). Out of the box this CI expects all site code to be in the `app` folder. It also expects all PHPUnit tests to be in `app/tests/PHPUnit`, with all Behat tests to be in `app/tests/behat/features`.
+This recipe contains support for tests run against [PHPUnit](https://github.com/sebastianbergmann/phpunit) and [Behat](https://github.com/Behat/Behat) as well as code style validation using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) (using PSR-2 standards). Out of the box this CI expects all site code to be in the `app` folder. It also expects all PHPUnit tests to be in `app/tests/PHPUnit`, with all Behat tests to be in `app/tests/behat/features`.
 
 If you do not need Behat tests you will need to remove the `behat` job in `.github/workflows/ci.yml`. If you want to disable [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) you need to remove the "Validate Code Style" step from the same file.
 
@@ -35,7 +36,6 @@ To run PHPUnit locally you can use the following to run all tests in the `app/te
 ```bash
 vendor/bin/PHPUnit app/tests/PHPUnit
 ```
-
 
 #### For Behat
 For Behat you either need to have to have your Silverstripe install in a webserver or use [silverstripe/serve](https://github.com/silverstripe/silverstripe-serve) (included). As well you need to install and have running [ChromeDriver](https://chromedriver.chromium.org/downloads) in a version that matches your local install of Chrome.
