@@ -1,0 +1,6 @@
+#---
+#Name: my_module
+#After:
+#    - "framework/*"
+#---
+# Stub config template for your module place you can uncomment this section and add your settings as needed

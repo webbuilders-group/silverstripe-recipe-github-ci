@@ -1,0 +1,20 @@
+{
+    "name": "webbuilders-group/silverstripe-github-ci-recipe",
+    "description": "A description of your module.",
+    "type": "silverstripe-module",
+    "keywords": ["silverstripe", "testing", "behat", "phpunit", "github", "ci", "actions"],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Ed Chipman",
+            "homepage": "https://webbuildersgroup.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "silverstripe/recipe-core": "~4"
+    },
+    "support": {
+        "issues": "https://github.com/webbuilders-group/silverstripe-github-ci-recipe/issues"
+    }
+}
