@@ -55,4 +55,4 @@ ci:
               - "--disable-dev-shm-usage"
               - "--no-sandbox"
     SilverStripe\BehatExtension\Extension:
-      bootstrap_file: "app/tests/utils/behat/serve-bootstrap.php"
+      bootstrap_file: "vendor/webbuilders-group/silverstripe-recipe-github-ci/utils/behat/serve-bootstrap.php"
