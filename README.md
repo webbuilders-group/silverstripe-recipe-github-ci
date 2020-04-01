@@ -1,83 +1,47 @@
-# SilverStripe supported module skeleton
+Silverstripe GitHub Actions CI Recipe
+=================
+Silverstripe Recipe for Bootstrapping a Project using GitHub Actions as a CI, for details on included/expanded features see the [docs](docs/).
 
-A useful skeleton to more easily create modules that conform to the [Module Standard]
-(https://docs.silverstripe.org/en/3.2/developer_guides/extending/modules/#module-standard).
+## Maintainer Contact
+* Ed Chipman ([UndefinedOffset](https://github.com/UndefinedOffset))
 
-This readme contains descriptions of the parts of this module base you should customize to meet you own module needs.
-For example, the module name in the H1 above should be you own module name, and the description text you are reading now
-is where you should provide a good short explanation of what your module does.
-
-Where possible we have included default text that can be included as is into your module and indicated in 
-other places where you need to customize it.
-
-Below is a template of the sections of your README.md you should ideally include to met the Module Standard 
-and help others make use of your modules.
-
-Make sure if you update your .travis.yml according to your needs, make sure to adjust the last line particularly the ``module/tests`` to point to your module's folder so tests will run. See the SilverStripe [Testing documentation](https://docs.silverstripe.org/en/developer_guides/testing/) for more information.
 
 ## Requirements
- * SilverStripe ^3.1
- * Other module
- * Other server requirement
- * Etc
+* SilverStripe Framework 4.4+
+
 
 ## Installation
-Add some installation instructions here, having a 1 line composer copy and paste is useful. 
-Here is a composer command to create a new module project. Ensure you read the ['publishing a module']
-(https://docs.silverstripe.org/en/developer_guides/extending/how_tos/publish_a_module/) guide update you module 
-composer.json to designate your code as a SilverStripe module. 
-
+__Composer (recommended):__
 ```
-composer create-project your-vendor-name/your-package-name
+composer require webbuilders-group/silverstripe-recipe-github-ci --dev
 ```
 
-## License
-See [License](LICENSE.md)
+## Getting Started
+This recipe contains support for tests run against [PHPUnit](https://github.com/sebastianbergmann/phpunit) and [Behat](https://github.com/Behat/Behat) as well as code style validation using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). Out of the box this CI expects all site code to be in the `app` folder. It also expects all PHPUnit tests to be in `app/tests/PHPUnit`, with all Behat tests to be in `app/tests/behat/features`.
 
-We have included a 3-clause BSD license you can use as a default. We advocate for the BSD license as 
-it is one of the most permissive and open licenses.
+If you do not need Behat tests you will need to remove the `behat` job in `.github/workflows/ci.yml`. If you want to disable [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) you need to remove the "Validate Code Style" step from the same file.
 
-Feel free to alter the [LICENSE.md](LICENSE.md) to suit if you want to use an alternative license.
-You can use [choosealicense.com](http://choosealicense.com) to help pick a suitable license for your project.
 
-## Documentation
-Add links into your docs/<language> folder here unless your module only requires minimal documentation 
-in that case, add here and remove the docs folder. You might use this as a quick table of content if you
-mhave multiple documentation pages.
+## Failed Tests Artifacts
+Artifacts such as an error log from Silverstripe, or screenshots from the Behat tests will be added to the artifacts section on for the action's run on GitHub. For the PHPUnit tests it will be named `CI-<run number>-phpunit`, for Behat tests it will be named `CI-<run number>-behat` unless you change them.
 
-## Example configuration (optional)
-If your module makes use of the config API in SIlverStripe it's a good idea to provide an example config
- here that will get the module working out of the box and expose the user to the possible configuration options.
 
-Provide a yaml code example where possible.
+## Testing Locally
+Testing locally is still possible though it will of course work differently than the GitHub Actions runner will.
 
-```yaml
+#### For PHPUnit
+To run PHPUnit locally you can use the following to run all tests in the `app/tests/PHPUnit` folder. If you want to run a specific test in that folder simply include the full path, so for example `app/tests/PHPUnit` might become `app/tests/PHPUnit/SomeFolder/SomeTest.php`.
 
-Page:
-  config_option: true
-  another_config:
-    - item1
-    - item2
-  
+```bash
+vendor/bin/PHPUnit app/tests/PHPUnit
 ```
 
-## Maintainers
- * Person here <person@emailaddress.com>
- * Another maintainer <maintain@emailaddress.com>
- 
-## Bugtracker
-Bugs are tracked in the issues section of this repository. Before submitting an issue please read over 
-existing issues to ensure yours is unique. 
- 
-If the issue does look like a new bug:
- 
- - Create a new issue
- - Describe the steps required to reproduce your issue, and the expected outcome. Unit tests, screenshots 
- and screencasts can help here.
- - Describe your environment as detailed as possible: SilverStripe version, Browser, PHP version, 
- Operating System, any installed SilverStripe modules.
- 
-Please report security issues to the module maintainers directly. Please don't file security issues in the bugtracker.
- 
-## Development and contribution
-If you would like to make contributions to the module please ensure you raise a pull request and discuss with the module maintainers.
+
+#### For Behat
+For Behat you either need to have to have your Silverstripe install in a webserver or use [silverstripe/serve](https://github.com/silverstripe/silverstripe-serve) (included). As well you need to install and have running [ChromeDriver](https://chromedriver.chromium.org/downloads) in a version that matches your local install of Chrome.
+
+After all of that, you should be able to run the following to run all Behat tests in the `app/tests/behat/features` folder. If you want to run a specific test in that folder simply include the full path, so for example `app/tests/behat/features` becomes `app/tests/behat/features/some-folder/some-scenario.feature`.
+
+```bash
+vendor/bin/behat @app ./app/tests/behat/features/ --rerun
+```

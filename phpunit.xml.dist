@@ -1,0 +1,15 @@
+<phpunit bootstrap="vendor/silverstripe/cms/tests/bootstrap.php" colors="true">
+	<testsuite name="Default">
+		<directory>app/tests/PHPUnit</directory>
+	</testsuite>
+	
+	<groups>
+		<exclude>
+			<group>sanitychecks</group>
+		</exclude>
+	</groups>
+    
+    <php>
+        <get name="flush" value="1"/>
+    </php>
+</phpunit>

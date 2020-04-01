@@ -1,6 +1,6 @@
 {
     "name": "webbuilders-group/silverstripe-github-ci-recipe",
-    "description": "Silverstripe Recipe for Bootstraping a Project using GitHub Actions as a CI",
+    "description": "Silverstripe Recipe for Bootstrapping a Project using GitHub Actions as a CI",
     "type": "silverstripe-recipe",
     "keywords": ["silverstripe", "testing", "behat", "phpunit", "github", "ci", "actions"],
     "license": "BSD-3-Clause",
@@ -12,9 +12,8 @@
         }
     ],
     "require": {
-        "silverstripe/recipe-cms": "~4.4"
-    },
-    "require-dev": {
+        "silverstripe/recipe-plugin": "^1.0",
+        "silverstripe/recipe-cms": "~4.4",
         "phpunit/phpunit": "^5.7",
         "silverleague/ideannotator": "~3.0",
         "squizlabs/php_codesniffer": "~3.4",
@@ -29,7 +28,11 @@
     "extra": {
         "project-files": [
             ".github/workflows/ci.yml",
-            "behat.yml"
+            "app/tests/behat/features/.gitignore",
+            "app/tests/PHPUnit/.gitignore",
+            "behat.yml",
+            "phpcs.xml.dist",
+            "phpunit.xml.dist"
         ]
     },
     "support": {

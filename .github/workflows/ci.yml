@@ -1,0 +1,159 @@
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+
+jobs:
+  phpunit_phpcs:
+    name: "PHPUnit Tests and PHP_CodeSniffer"
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: testpassword
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.2
+          extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
+
+      - name: Start mysql service
+        run: sudo /etc/init.d/mysql start
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        env:
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        run: |
+          composer self-update --ansi || true
+          if [[ $GITHUB_ACCESS_TOKEN ]]; then composer config --ansi -g github-oauth.github.com $GITHUB_ACCESS_TOKEN; fi
+          composer install --verbose --no-interaction --no-progress --no-suggest --ignore-platform-reqs --optimize-autoloader --ansi
+
+      - name: Configure Environment
+        run: |
+          cp vendor/webbuilders-group/silverstripe-recipe-github-ci/utils/actions.env.template .env
+          mkdir artifacts
+
+      - name: Perform PHPUnit Tests
+        env:
+          SS_DATABASE_PORT: ${{ job.services.mysql.ports['3306'] }}
+        run: vendor/bin/phpunit --colors=always app/tests/PHPUnit
+
+      - uses: actions/upload-artifact@v2-preview
+        if: failure()
+        with:
+          name: ${{ github.workflow }}-${{ github.run_id }}-phpunit
+          path: ${{ github.workspace }}/artifacts/
+
+      - name: Validate Code Style
+        run: vendor/bin/phpcs --colors app
+
+  behat:
+    name: "Behavior Testing"
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: testpassword
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.2
+          extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
+
+      - name: Start mysql service
+        run: sudo /etc/init.d/mysql start
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        env:
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        run: |
+          composer self-update --ansi || true
+          if [[ $GITHUB_ACCESS_TOKEN ]]; then composer config --ansi -g github-oauth.github.com $GITHUB_ACCESS_TOKEN; fi
+          composer install --verbose --no-interaction --no-progress --no-suggest --ignore-platform-reqs --optimize-autoloader --ansi
+
+      - name: Configure Environment
+        run: |
+          cp vendor/webbuilders-group/silverstripe-recipe-github-ci/utils/actions.env.template .env
+          echo "SS_DATABASE_PORT=${{ job.services.mysql.ports['3306'] }}" >> .env
+          mkdir artifacts
+
+      - name: Install Chrome and ChromeDriver
+        uses: nanasess/setup-chromedriver@v1.0.1
+
+      - name: Start Xvfb
+        env:
+          DISPLAY: ":99"
+        run: |
+          sudo Xvfb -ac :99 -screen 0 1280x800x24 > /dev/null 2>&1 &
+          sleep 3
+
+      - name: Start ChromeDriver and Serve
+        env:
+          DISPLAY: ":99"
+        run: |
+          chromedriver > artifacts/chromedriver.log 2>&1 &
+          sleep 3
+          vendor/bin/serve --bootstrap=vendor/webbuilders-group/silverstripe-recipe-github-ci/utils/behat/serve-bootstrap.php --port=8000 &> artifacts/serve.log &
+
+      - name: Perform Behat Tests
+        env:
+          DISPLAY: ":99"
+          BEHAT_SCREEN_SIZE: "1200x800"
+          WBG_BEHAT_BASE_URL: "http://localhost:8000"
+        run: vendor/bin/behat @app ./app/tests/behat/features/ --rerun --colors --profile=ci
+
+      - uses: actions/upload-artifact@v2-preview
+        if: failure()
+        with:
+          name: ${{ github.workflow }}-${{ github.run_id }}-behat
+          path: ${{ github.workspace }}/artifacts/
