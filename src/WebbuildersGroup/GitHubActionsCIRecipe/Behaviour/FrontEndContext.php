@@ -2,10 +2,7 @@
 namespace WebbuildersGroup\GitHubActionsCIRecipe\Behaviour;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
-use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Hook\Scope\BeforeStepScope;
 use SilverStripe\BehatExtension\Context\MainContextAwareTrait;
 use SilverStripe\Core\Convert;
 use Exception;

@@ -1,11 +1,13 @@
 <?php
 namespace WebbuildersGroup\GitHubActionsCIRecipe\Behaviour;
 
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use SilverStripe\BehatExtension\Context\SilverStripeContext;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\TestSession\TestSessionStubCodeWriter;
 use SilverStripe\Versioned\Versioned;
 
 /**
