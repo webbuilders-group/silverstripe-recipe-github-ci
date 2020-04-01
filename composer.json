@@ -1,5 +1,5 @@
 {
-    "name": "webbuilders-group/silverstripe-github-ci-recipe",
+    "name": "webbuilders-group/silverstripe-recipe-github-ci",
     "description": "Silverstripe Recipe for Bootstrapping a Project using GitHub Actions as a CI",
     "type": "silverstripe-recipe",
     "keywords": ["silverstripe", "testing", "behat", "phpunit", "github", "ci", "actions"],
