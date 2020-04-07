@@ -36,7 +36,7 @@ jobs:
         with:
           php-version: 7.2
           extensions: ${{ env.php_extensions }}
-          key: ${{ hashFiles('.github/workflow/ci.yml') }}
+          key: php-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Cache PHP Extensions
         uses: actions/cache@v1
@@ -118,7 +118,7 @@ jobs:
         with:
           php-version: 7.2
           extensions: ${{ env.php_extensions }}
-          key: ${{ hashFiles('.github/workflow/ci.yml') }}
+          key: php-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Cache PHP Extensions
         uses: actions/cache@v1
