@@ -13,6 +13,8 @@ jobs:
   phpunit_phpcs:
     name: "PHPUnit Tests and PHP_CodeSniffer"
     runs-on: ubuntu-latest
+    env:
+      php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
     services:
       mysql:
         image: mysql:5.7
@@ -28,11 +30,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Setup PHP Extension Cache
+        id: cache-env
+        uses: shivammathur/cache-extensions@v1
+        with:
+          php-version: 7.2
+          extensions: ${{ env.php_extensions }}
+          key: ${{ hashFiles('.github/workflow/ci.yml') }}
+
+      - name: Cache PHP Extensions
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.cache-env.outputs.dir }}
+          key: ${{ steps.cache-env.outputs.key }}
+          restore-keys: ${{ steps.cache-env.outputs.key }}
+
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.2
-          extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
+          extensions: ${{ env.php_extensions }}
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
@@ -78,6 +95,8 @@ jobs:
   behat:
     name: "Behavior Testing"
     runs-on: ubuntu-latest
+    env:
+      php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
     services:
       mysql:
         image: mysql:5.7
@@ -93,11 +112,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Setup PHP Extension Cache
+        id: cache-env
+        uses: shivammathur/cache-extensions@v1
+        with:
+          php-version: 7.2
+          extensions: ${{ env.php_extensions }}
+          key: ${{ hashFiles('.github/workflow/ci.yml') }}
+
+      - name: Cache PHP Extensions
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.cache-env.outputs.dir }}
+          key: ${{ steps.cache-env.outputs.key }}
+          restore-keys: ${{ steps.cache-env.outputs.key }}
+
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.2
-          extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
+          extensions: ${{ env.php_extensions }}
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
