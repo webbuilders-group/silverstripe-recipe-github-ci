@@ -48,6 +48,7 @@ jobs:
         with:
           php-version: 7.2
           extensions: ${{ env.php_extensions }}
+          coverage: none
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
@@ -130,6 +131,7 @@ jobs:
         with:
           php-version: 7.2
           extensions: ${{ env.php_extensions }}
+          coverage: none
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
