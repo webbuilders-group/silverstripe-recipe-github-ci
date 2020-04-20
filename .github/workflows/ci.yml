@@ -12,6 +12,7 @@ jobs:
     name: "PHPUnit Tests and PHP_CodeSniffer"
     runs-on: ubuntu-latest
     env:
+      php_version: 7.2
       php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
     services:
       mysql:
@@ -32,7 +33,7 @@ jobs:
         id: cache-env
         uses: shivammathur/cache-extensions@v1
         with:
-          php-version: 7.2
+          php-version: ${{ env.php_version }}
           extensions: ${{ env.php_extensions }}
           key: php-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
@@ -46,9 +47,8 @@ jobs:
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.2
+          php-version: ${{ env.php_version }}
           extensions: ${{ env.php_extensions }}
-          coverage: none
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
@@ -80,7 +80,11 @@ jobs:
       - name: Perform PHPUnit Tests
         env:
           SS_DATABASE_PORT: ${{ job.services.mysql.ports['3306'] }}
-        run: vendor/bin/phpunit --colors=always app/tests/PHPUnit
+        run: vendor/bin/phpunit --colors=always app/tests/PHPUnit --log-github_annotator=artifacts/phpunit.log
+
+      - name: Annotate PHP Unit Failures
+        if: failure()
+        run: (test -f artifacts/phpunit.log && echo "::add-matcher::.github/matchers/phpunit.json" && cat artifacts/phpunit.log && echo "::remove-matcher owner=phpunit::")
 
       - uses: actions/upload-artifact@v2-preview
         if: failure()
@@ -89,12 +93,17 @@ jobs:
           path: ${{ github.workspace }}/artifacts/
 
       - name: Validate Code Style
-        run: vendor/bin/phpcs --colors app
+        run: vendor/bin/phpcs --colors app --report=full --report-checkstyle=artifacts/phpcs.xml
+
+      - name: Annotate Code Style Issues
+        if: failure()
+        run: (test -f artifacts/phpcs.xml && echo "::add-matcher::.github/matchers/phpcs.json" && cat artifacts/phpcs.xml && echo "::remove-matcher owner=phpcs::")
 
   behat:
     name: "Behavior Testing"
     runs-on: ubuntu-latest
     env:
+      php_version: 7.2
       php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
     services:
       mysql:
@@ -115,7 +124,7 @@ jobs:
         id: cache-env
         uses: shivammathur/cache-extensions@v1
         with:
-          php-version: 7.2
+          php-version: ${{ env.php_version }}
           extensions: ${{ env.php_extensions }}
           key: php-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
@@ -129,9 +138,8 @@ jobs:
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.2
+          php-version: ${{ env.php_version }}
           extensions: ${{ env.php_extensions }}
-          coverage: none
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
@@ -184,7 +192,11 @@ jobs:
           DISPLAY: ":99"
           BEHAT_SCREEN_SIZE: "1200x800"
           WBG_BEHAT_BASE_URL: "http://localhost:8000"
-        run: vendor/bin/behat @app ./app/tests/behat/features/ --rerun --colors --profile=ci
+        run: vendor/bin/behat @app ./app/tests/behat/features/ --rerun --colors --profile=ci --format pretty --format github_annotator
+
+      - name: Annotate Behat Failures
+        if: failure()
+        run: (test -f artifacts/behat.log && echo "::add-matcher::.github/matchers/behat.json" && cat artifacts/behat.log && echo "::remove-matcher owner=behat::")
 
       - uses: actions/upload-artifact@v2-preview
         if: failure()

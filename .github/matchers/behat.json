@@ -1,0 +1,17 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "behat",
+            "severity": "error",
+            "pattern": [
+                {
+                    "regexp": "##teamcity\\[testFailed.+name='([^']+)'.+message='([^']+)'.+details='\\s+/home/runner/work/[^/]+/[^/]+/([^:]+):(\\d+)[^']+'",
+                    "defaultSeverity": "error",
+                    "message": 2,
+                    "file": 3,
+                    "line": 4
+                }
+            ]
+        }
+    ]
+}
