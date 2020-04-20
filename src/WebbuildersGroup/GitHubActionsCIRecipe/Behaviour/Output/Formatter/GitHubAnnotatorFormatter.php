@@ -1,5 +1,5 @@
 <?php
-namespace src\WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Formatter;
+namespace WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Formatter;
 
 use Behat\Behat\EventDispatcher\Event\AfterOutlineTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;

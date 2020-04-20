@@ -6,8 +6,8 @@ use Behat\Testwork\Output\ServiceContainer\OutputExtension;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Formatter\GitHubAnnotatorFormatter;
 use WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer\FileOutputPrinter;
-use src\WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Formatter\GitHubAnnotatorFormatter;
 
 class AnnotatorFormatterExtension extends TeamCityFormatterExtension
 {
