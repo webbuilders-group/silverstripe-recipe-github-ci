@@ -20,8 +20,8 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
     private static $REPLACEMENTS = [
         "|"  => "||",
         "'"  => "|'",
-        "\n" => "|n",
-        "\r" => "|r",
+        "\n" => '\n',
+        "\r" => '\r',
         "["  => "|[",
         "]"  => "|]",
     ];
