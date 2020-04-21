@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Formatter\GitHubAnnotatorFormatter;
-use WebbuildersWebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer\ConsoleOutput;
+use WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer\ConsoleOutput;
 
 class AnnotatorFormatterExtension implements Extension
 {

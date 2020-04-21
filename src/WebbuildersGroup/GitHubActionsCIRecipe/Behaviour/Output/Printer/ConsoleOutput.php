@@ -1,5 +1,5 @@
 <?php
-namespace WebbuildersWebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer;
+namespace WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer;
 
 use Behat\Testwork\Output\Printer\OutputPrinter;
 use Symfony\Component\Console\Output\OutputInterface;

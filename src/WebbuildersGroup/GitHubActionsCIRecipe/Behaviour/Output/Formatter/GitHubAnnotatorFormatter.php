@@ -14,7 +14,7 @@ use Behat\Gherkin\Node\ScenarioLikeInterface;
 use Behat\Testwork\Output\Formatter;
 use Behat\Testwork\Tester\Result\ExceptionResult;
 use Behat\Testwork\Tester\Result\TestResult;
-use WebbuildersWebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer\ConsoleOutput;
+use WebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer\ConsoleOutput;
 
 class GitHubAnnotatorFormatter implements Formatter
 {
