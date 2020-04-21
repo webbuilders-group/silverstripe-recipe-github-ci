@@ -50,7 +50,7 @@ class GitHubActionsAnnotatorPrinter extends PHPUnit_TextUI_ResultPrinter
             );
         }
         
-        $message = explode("\n", trim((string) $e));
+        $message = explode("\n", trim($defect->getTestName() . "\n\n" . (string) $e));
         $message = implode('%0A', $message);
         
         $type = $this->getCurrentType();
