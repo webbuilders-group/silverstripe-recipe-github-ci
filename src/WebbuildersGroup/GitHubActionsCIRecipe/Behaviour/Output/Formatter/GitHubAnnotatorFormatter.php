@@ -6,25 +6,49 @@ use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Behat\Behat\EventDispatcher\Event\BeforeOutlineTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
+use Behat\Behat\EventDispatcher\Event\OutlineTested;
+use Behat\Behat\EventDispatcher\Event\ScenarioTested;
+use Behat\Behat\EventDispatcher\Event\StepTested;
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\ScenarioLikeInterface;
-use Behat\TeamCityFormatter\TeamCityFormatter;
+use Behat\Testwork\Output\Formatter;
 use Behat\Testwork\Tester\Result\ExceptionResult;
 use Behat\Testwork\Tester\Result\TestResult;
+use WebbuildersWebbuildersGroup\GitHubActionsCIRecipe\Behaviour\Output\Printer\ConsoleOutput;
 
-class GitHubAnnotatorFormatter extends TeamCityFormatter
+class GitHubAnnotatorFormatter implements Formatter
 {
     /** @var CallResult|null */
     private $failedStep;
     
     private static $REPLACEMENTS = [
-        "|"  => "||",
-        "'"  => "|'",
+        "'"  => '\\\\\'',
         "\n" => '%0A',
-        "\r" => "|r",
-        "["  => "|[",
-        "]"  => "|]",
+        "\r" => '%0D',
     ];
+    
+    /**
+     * Constructor
+     * @param ConsoleOutput $printer
+     */
+    public function __construct(ConsoleOutput $printer)
+    {
+        $this->printer = $printer;
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            ScenarioTested::BEFORE => 'onBeforeScenarioTested',
+            ScenarioTested::AFTER => 'onAfterScenarioTested',
+            OutlineTested::BEFORE => 'onBeforeOutlineTested',
+            OutlineTested::AFTER => 'onAfterOutlineTested',
+            StepTested::AFTER => 'saveFailedStep',
+        ];
+    }
     
     /**
      * Returns formatter name.
@@ -33,6 +57,42 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
     public function getName()
     {
         return 'github_annotator';
+    }
+    
+    /**
+     * Returns formatter description.
+     * @return string
+     */
+    public function getDescription()
+    {
+        return 'Formatter that adds annotations for GitHub Actions on failure';
+    }
+    
+    /**
+     * Sets formatter parameter.
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setParameter($name, $value)
+    {
+    }
+    
+    /**
+     * Returns parameter name.
+     * @param string $name
+     * @return mixed
+     */
+    public function getParameter($name)
+    {
+    }
+    
+    /**
+     * Returns formatter output printer.
+     * @return OutputPrinter
+     */
+    public function getOutputPrinter()
+    {
+        return $this->printer;
     }
     
     public function saveFailedStep(AfterStepTested $event)
@@ -47,15 +107,11 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
     public function onBeforeScenarioTested(BeforeScenarioTested $event)
     {
         $this->failedStep = null;
-        
-        parent::onBeforeScenarioTested($event);
     }
     
     public function onBeforeOutlineTested(BeforeOutlineTested $event)
     {
         $this->failedStep = null;
-        
-        parent::onBeforeOutlineTested($event);
     }
     
     public function onAfterScenarioTested(AfterScenarioTested $event)
@@ -68,17 +124,15 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
         $this->afterTest($event->getTestResult(), $event->getOutline());
     }
     
-    private function afterTest(TestResult $result, ScenarioLikeInterface $scenario, FeatureNode $feature = null)
+    protected function afterTest(TestResult $result, ScenarioLikeInterface $scenario, FeatureNode $feature = null)
     {
-        $params = ['name' => $scenario->getTitle()];
-        
         switch ($result->getResultCode()) {
-            case TestResult::SKIPPED:
-                break;
-            case TestResult::PASSED:
-                break;
             case TestResult::FAILED:
-                $failedParams = $params;
+                $failedParams = [
+                    'message' => '',
+                    'file' => false,
+                    'line' => false,
+                ];
                 
                 if ($this->failedStep && $this->failedStep->hasException()) {
                     switch (true) {
@@ -87,7 +141,8 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
                             $failedParams['message'] = 'Scenario: ' . $scenario->getTitle() . "\n\n" . $exception->getMessage();
                             if ($feature != null) {
                                 $failedParams['message'] = 'Feature: ' . $feature->getTitle() . "\n" . $failedParams['message'];
-                                $failedParams['details'] = ' ' . $feature->getFile() . ':' . $scenario->getLine() . "\n ";
+                                $failedParams['file'] = $feature->getFile();
+                                $failedParams['line'] = $scenario->getLine();
                             }
                             
                             break;
@@ -95,30 +150,18 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
                             $failedParams['message'] = sprintf("Unknown error in ", get_class($this->failedStep));
                             break;
                     }
-                    
                 }
                 
-                $this->writeServiceMessage('testFailed', $failedParams);
+                $this->writeServiceMessage($failedParams);
                 
                 break;
         }
-        
-        $this->writeServiceMessage('testFinished', $params);
     }
     
-    private function writeServiceMessage($messageKey, array $params = array())
+    protected function writeServiceMessage(array $params)
     {
-        $message = '';
-        $search  = array_keys(self::$REPLACEMENTS);
-        $replace = array_values(self::$REPLACEMENTS);
+        $message = str_replace(array_keys(self::$REPLACEMENTS), array_values(self::$REPLACEMENTS), $params['message']);
         
-        foreach ($params as $key => $value) {
-            $value    = str_replace($search, $replace, $value);
-            $message .= sprintf(" %s='%s'", $key, $value);
-        }
-        
-        $message = sprintf("##teamcity[%s %s]", $messageKey, trim($message));
-        
-        $this->printer->writeln($message);
+        $this->printer->writeln('::error' . ($params['file'] !== false ? ' file=' . $params['file'] . ',line=' . $params['line'] : '') . '::' . trim($message));
     }
 }
