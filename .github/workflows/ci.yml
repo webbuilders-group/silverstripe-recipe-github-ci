@@ -80,11 +80,7 @@ jobs:
       - name: Perform PHPUnit Tests
         env:
           SS_DATABASE_PORT: ${{ job.services.mysql.ports['3306'] }}
-        run: vendor/bin/phpunit --colors=always app/tests/PHPUnit --log-github_annotator=artifacts/phpunit.log
-
-      - name: Annotate PHP Unit Failures
-        if: failure()
-        run: (test -f artifacts/phpunit.log && echo "::add-matcher::.github/matchers/phpunit.json" && cat artifacts/phpunit.log && echo "::remove-matcher owner=phpunit::")
+        run: vendor/bin/phpunit --colors=always --printer WebbuildersGroup\\GitHubActionsCIRecipe\\PHPUnit\\GitHubActionsAnnotatorPrinter app/tests/PHPUnit
 
       - uses: actions/upload-artifact@v2-preview
         if: failure()
@@ -193,10 +189,6 @@ jobs:
           BEHAT_SCREEN_SIZE: "1200x800"
           WBG_BEHAT_BASE_URL: "http://localhost:8000"
         run: vendor/bin/behat @app ./app/tests/behat/features/ --rerun --colors --profile=ci --format pretty --format github_annotator
-
-      - name: Annotate Behat Failures
-        if: failure()
-        run: (test -f artifacts/behat.log && echo "::add-matcher::.github/matchers/behat.json" && cat artifacts/behat.log && echo "::remove-matcher owner=behat::")
 
       - uses: actions/upload-artifact@v2-preview
         if: failure()
