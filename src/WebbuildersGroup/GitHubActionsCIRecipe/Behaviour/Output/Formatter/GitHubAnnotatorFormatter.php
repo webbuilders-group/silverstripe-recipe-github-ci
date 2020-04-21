@@ -74,8 +74,6 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
         
         switch ($result->getResultCode()) {
             case TestResult::SKIPPED:
-                #$this->writeServiceMessage('testIgnored', $params);
-                #return;
                 break;
             case TestResult::PASSED:
                 break;
@@ -86,8 +84,9 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
                     switch (true) {
                         case ($this->failedStep instanceof ExceptionResult && $this->failedStep->hasException()):
                             $exception = $this->failedStep->getException();
-                            $failedParams['message'] = $exception->getMessage();
+                            $failedParams['message'] = 'Scenario: ' . $scenario->getTitle() . "\n\n" . $exception->getMessage();
                             if ($feature != null) {
+                                $failedParams['message'] = 'Feature: ' . $feature->getTitle() . "\n" . $failedParams['message'];
                                 $failedParams['details'] = ' ' . $feature->getFile() . ':' . $scenario->getLine() . "\n ";
                             }
                             
@@ -97,7 +96,6 @@ class GitHubAnnotatorFormatter extends TeamCityFormatter
                             break;
                     }
                     
-                    #$failedParams['details'] = $this->sanitizeExceptionStack($exception);
                 }
                 
                 $this->writeServiceMessage('testFailed', $failedParams);
