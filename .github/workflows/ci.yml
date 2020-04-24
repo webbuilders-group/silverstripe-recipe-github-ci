@@ -66,7 +66,7 @@ jobs:
 
       - name: Install Composer dependencies
         env:
-            GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
           composer self-update --ansi || true
           if [[ $GITHUB_ACCESS_TOKEN ]]; then composer config --ansi -g github-oauth.github.com $GITHUB_ACCESS_TOKEN; fi
@@ -153,7 +153,7 @@ jobs:
 
       - name: Install Composer dependencies
         env:
-            GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+            GITHUB_ACCESS_TOKEN: ${{ secrets.GH_ACCESS_TOKEN }}
         run: |
           composer self-update --ansi || true
           if [[ $GITHUB_ACCESS_TOKEN ]]; then composer config --ansi -g github-oauth.github.com $GITHUB_ACCESS_TOKEN; fi
