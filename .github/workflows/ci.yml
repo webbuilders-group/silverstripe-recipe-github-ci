@@ -11,6 +11,7 @@ jobs:
   phpunit_phpcs:
     name: "PHPUnit Tests and PHP_CodeSniffer"
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
     env:
       php_version: 7.2
       php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
@@ -98,6 +99,7 @@ jobs:
   behat:
     name: "Behavior Testing"
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
     env:
       php_version: 7.2
       php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
