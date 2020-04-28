@@ -83,7 +83,7 @@ jobs:
           SS_DATABASE_PORT: ${{ job.services.mysql.ports['3306'] }}
         run: vendor/bin/phpunit --colors=always --printer WebbuildersGroup\\GitHubActionsCIRecipe\\PHPUnit\\GitHubActionsAnnotatorPrinter app/tests/PHPUnit
 
-      - uses: actions/upload-artifact@v2-preview
+      - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: ${{ github.workflow }}-${{ github.run_id }}-phpunit
@@ -192,7 +192,7 @@ jobs:
           WBG_BEHAT_BASE_URL: "http://localhost:8000"
         run: vendor/bin/behat @app ./app/tests/behat/features/ --rerun --colors --profile=ci --format pretty --format github_annotator
 
-      - uses: actions/upload-artifact@v2-preview
+      - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: ${{ github.workflow }}-${{ github.run_id }}-behat
