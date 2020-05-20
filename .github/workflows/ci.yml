@@ -50,6 +50,8 @@ jobs:
         with:
           php-version: ${{ env.php_version }}
           extensions: ${{ env.php_extensions }}
+          ini-values: log_errors=On, error_log="${{github.workspace}}/artifacts/php_errors.log"
+          coverage: none
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
@@ -138,6 +140,8 @@ jobs:
         with:
           php-version: ${{ env.php_version }}
           extensions: ${{ env.php_extensions }}
+          ini-values: log_errors=On, error_log="${{github.workspace}}/artifacts/php_errors.log"
+          coverage: none
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
