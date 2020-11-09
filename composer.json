@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "WebbuildersGroup\\GitHubActionsCIRecipe\\": "src/"
+            "WebbuildersGroup\\GitHubActionsCIRecipe\\": "src/WebbuildersGroup/GitHubActionsCIRecipe"
         }
     },
     "extra": {
