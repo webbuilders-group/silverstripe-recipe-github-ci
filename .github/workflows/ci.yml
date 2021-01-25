@@ -52,6 +52,7 @@ jobs:
           extensions: ${{ env.php_extensions }}
           ini-values: log_errors=On, error_log="${{github.workspace}}/artifacts/php_errors.log"
           coverage: none
+          tools: composer:v1
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
@@ -142,6 +143,7 @@ jobs:
           extensions: ${{ env.php_extensions }}
           ini-values: log_errors=On, error_log="${{github.workspace}}/artifacts/php_errors.log"
           coverage: none
+          tools: composer:v1
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
